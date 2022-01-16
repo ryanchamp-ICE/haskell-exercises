@@ -160,9 +160,9 @@ hanoi3 _ 0 _ _ _ = []
 hanoi3 towerList@[x, y, z] n src spare dest = 
 -- Move n-1 disks to spare
   hanoi3 [disksAbove x, y, z] (n - 1) src dest spare ++
--- Move final disk to target
+-- Move final disk to target (Not sure how to define this tower list here)
   [moveElem 0 minInt [x, y, z] src dest] ++
--- Move n-1 disks to target
+-- Move n-1 disks to target (Not sure how to define this tower list here)
   hanoi3 [x, y, z] (n-1) spare src dest
 
 -- Other solutions below
