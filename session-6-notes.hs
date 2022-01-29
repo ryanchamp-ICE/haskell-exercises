@@ -70,3 +70,22 @@ keepOnlyEven x = filterIntList even x
 
 keepOnlyOdd :: IntList -> IntList
 keepOnlyOdd x = filterIntList odd x
+
+{-
+f :: Int -> Int
+x :: Int
+
+f x :: Int
+Cons :: Int -> IntList -> IntList
+applyToAll f xs :: IntList
+
+applyToAll :: (Int -> Int) -> IntList -> IntList
+xs :: IntList
+applyToAll f xs :: IntList
+
+f x :: Int
+Cons :: Int -> IntList -> IntList
+applyToAll f xs :: IntList
+
+Cons (f x) (applyToAll f xs) :: IntList
+-}

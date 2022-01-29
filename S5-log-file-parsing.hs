@@ -72,7 +72,7 @@ data MessageTree
     | Node MessageTree MessageType MessageTree
     deriving (Show, Eq)
 
-getTimeStamp :: MessageType -> Int 
+getTimeStamp :: MessageType -> Int
 getTimeStamp (Information ts _) = ts
 getTimeStamp (Warning ts _) = ts
 getTimeStamp (Error _ ts _) = ts
@@ -94,7 +94,7 @@ insert :: MessageType -> MessageTree -> MessageTree
 insert msgType Leaf = Node Leaf msgType Leaf
 insert (Unknown _) msgTree = msgTree
 insert input curNode@(Node left nodeMsgType right)
-  | getTimeStamp input < getTimeStamp nodeMsgType = Node (insert input left) nodeMsgType right 
+  | getTimeStamp input < getTimeStamp nodeMsgType = Node (insert input left) nodeMsgType right
   | getTimeStamp input > getTimeStamp nodeMsgType = Node left nodeMsgType (insert input right)
   | otherwise = curNode
 
@@ -107,11 +107,17 @@ inOrder :: MessageTree -> [MessageType]
 inOrder Leaf = []
 inOrder (Node left m right) = inOrder left ++ [m] ++ inOrder right
 
-filterCatastrophes :: [MessageType] -> [MessageType]
-filterCatastrophes [] = []
-filterCatastrophes (x:xs)
-  | getSeverity x > 50 = x : filterCatastrophes xs
-  | otherwise = filterCatastrophes xs
+-- filterCatastrophes :: [MessageType] -> [MessageType]
+-- filterCatastrophes [] = []
+-- filterCatastrophes (x:xs)
+--   | getSeverity x > 50 = x : filterCatastrophes xs
+--   | otherwise = filterCatastrophes xs
+filterMessages :: (MessageType -> Bool) -> [MessageType] -> [MessageType]
+filterMessages _ [] = []
+filterMessages f (x:xs)
+  | f x = x : filterMessages f xs
+  | otherwise = filterMessages f xs
 
 whatWentWrong :: [MessageType] -> [String]
-whatWentWrong msgs = map getMessageString (filterCatastrophes (inOrder (insertListIntoTree msgs)))
+whatWentWrong msgs = map getMessageString (filterMessages isCatastrophe (inOrder (insertListIntoTree msgs)))
+  where isCatastrophe x = getSeverity x > 50
