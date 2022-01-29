@@ -47,12 +47,12 @@ data MessageType
     deriving (Show, Eq)
 
 parseMessageType :: [String] -> MessageType
-parseMessageType [x] = Unknown x
 parseMessageType (x:y:z:zs)
   | x == "I" = Information (read y) (unwords [z, unwords zs])
   | x == "W" = Warning (read y) (unwords [z, unwords zs])
   | x == "E" = Error (read y) (read z) (unwords zs)
   | otherwise = Unknown (unwords [x, y, z, unwords zs])
+parseMessageType x = Unknown (unwords x)
 
 createMessageType :: String -> MessageType
 createMessageType line = parseMessageType (words line)
