@@ -35,6 +35,7 @@
 -- logFile :: String
 -- logFile = "I 147 Vader has risen\nE 2 148 The droids have invaded the star-ship\nW 149 IceColdEdge has entered the building.\nI 150 I.C.E. has started doing work\nW 151 his daughter has come in.\nE 5 152 She knocked over his computer.\nZ23lk4joipfdslkjr\nT 153 Trace message"
 
+-- Log file unordered
 logFile :: String
 logFile = "I 147 Vader has risen\nE 51 152 She knocked over his computer.\nI 150 I.C.E. has started doing work\nW 151 his daughter has come in.\nW 149 IceColdEdge has entered the building.\nZ23lk4joipfdslkjr\nT 153 Trace message\nE 2 148 The droids have invaded the star-ship\n"
 
@@ -91,7 +92,7 @@ getMessageString (Unknown msgString) = msgString
 
 insert :: MessageType -> MessageTree -> MessageTree
 insert msgType Leaf = Node Leaf msgType Leaf
-insert (Unknown msgString) msgTree = msgTree
+insert (Unknown _) msgTree = msgTree
 insert input curNode@(Node left nodeMsgType right)
   | getTimeStamp input < getTimeStamp nodeMsgType = Node (insert input left) nodeMsgType right 
   | getTimeStamp input > getTimeStamp nodeMsgType = Node left nodeMsgType (insert input right)
