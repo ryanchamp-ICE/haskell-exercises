@@ -32,8 +32,11 @@
 --     , Error 2 148 "The droids have invaded the star-ship"
 --     ]
 
+-- logFile :: String
+-- logFile = "I 147 Vader has risen\nE 2 148 The droids have invaded the star-ship\nW 149 IceColdEdge has entered the building.\nI 150 I.C.E. has started doing work\nW 151 his daughter has come in.\nE 5 152 She knocked over his computer.\nZ23lk4joipfdslkjr\nT 153 Trace message"
+
 logFile :: String
-logFile = "I 147 Vader has risen\nE 2 148 The droids have invaded the star-ship\nW 149 IceColdEdge has entered the building.\nI 150 I.C.E. has started doing work\nW 151 his daughter has come in.\nE 5 152 She knocked over his computer.\nZ23lk4joipfdslkjr\nT 153 Trace message"
+logFile = "I 147 Vader has risen\nE 51 152 She knocked over his computer.\nI 150 I.C.E. has started doing work\nW 151 his daughter has come in.\nW 149 IceColdEdge has entered the building.\nZ23lk4joipfdslkjr\nT 153 Trace message\nE 2 148 The droids have invaded the star-ship\n"
 
 data MessageType
     = Information Int String
@@ -68,21 +71,46 @@ data MessageTree
     | Node MessageTree MessageType MessageTree
     deriving (Show, Eq)
 
+getTimeStamp :: MessageType -> Int 
+getTimeStamp (Information ts _) = ts
+getTimeStamp (Warning ts _) = ts
+getTimeStamp (Error _ ts _) = ts
+getTimeStamp (Unknown _) = -999
+
+getSeverity :: MessageType -> Int
+getSeverity (Information _ _) = 0
+getSeverity (Warning _ _) = 0
+getSeverity (Error sev _ _) = sev
+getSeverity (Unknown _) = 0
+
+getMessageString :: MessageType -> String
+getMessageString (Information _ msgString) = msgString
+getMessageString (Warning _ msgString) = msgString
+getMessageString (Error _ _ msgString) = msgString
+getMessageString (Unknown msgString) = msgString
+
 insert :: MessageType -> MessageTree -> MessageTree
 insert msgType Leaf = Node Leaf msgType Leaf
 insert (Unknown msgString) msgTree = msgTree
-insert input@(Error severity timestamp msgString) curNode@(Node left (Error _ ts _) right)
-  | timestamp < ts = insert input left
-  | timestamp > ts = insert input right
+insert input curNode@(Node left nodeMsgType right)
+  | getTimeStamp input < getTimeStamp nodeMsgType = Node (insert input left) nodeMsgType right 
+  | getTimeStamp input > getTimeStamp nodeMsgType = Node left nodeMsgType (insert input right)
   | otherwise = curNode
--- insert input@(_ timestamp msgString) curNode@(Node left (Error _ ts _) right)
---   | timestamp < ts = insert input left
---   | timestamp > ts = insert input right
---   | otherwise = curNode
+
+insertListIntoTree :: [MessageType] -> MessageTree
+insertListIntoTree [] = Leaf
+insertListIntoTree [x] = insert x Leaf
+insertListIntoTree (x:xs) = insert x (insertListIntoTree xs)
 
 inOrder :: MessageTree -> [MessageType]
 inOrder Leaf = []
 inOrder (Node left m right) = inOrder left ++ [m] ++ inOrder right
 
--- whatWentWrong :: [MessageType] -> [String]
--- whatWentWrong msgs = map (inOrder . insert msgs)
+filterCatastrophes :: [MessageType] -> [MessageType]
+filterCatastrophes [] = []
+filterCatastrophes (x:xs)
+  | getSeverity x > 50 = x : filterCatastrophes xs
+  | otherwise = filterCatastrophes xs
+
+whatWentWrong :: [MessageType] -> [String]
+whatWentWrong msgs = map getMessageString (filterCatastrophes (inOrder (insertListIntoTree msgs)))
