@@ -50,3 +50,23 @@ mSkipsHelper n (x : xs) = (mTakeNth n (x : xs)) : mSkipsHelper (n + 1) xs
 
 mSkips :: [a] -> [[a]]
 mSkips = mSkipsHelper 1
+----------------------------------------------------------------------------------
+-- Fabio's Solution
+-- Fabio Correa
+-- module Skips (
+--   skips
+-- ) where
+
+-- Here the strategy is to build up a list of tuples of the form (Index, Element)
+-- where Element is the ith member of the input list
+-- Then map a filtering function that you map over the list of indices 
+-- to return the elements where their corresponding index in the tuple 
+-- mod the index you are looking for == 0
+
+skips :: [a] -> [[a]]
+skips xs =
+  let
+    ps = [1..length xs] -- auxiliary list to allow iteration on the input list
+    zs = zip ps xs      -- auxliliar list to indicate the position of each element
+  in
+    map (\p -> [ze | (zp,ze) <- zs, mod zp p == 0]) ps
