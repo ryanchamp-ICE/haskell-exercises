@@ -19,13 +19,14 @@ histogramLines xs len
   | len == -1 = histogramDivider xs ++ histogramLines xs (len - 1)
   | otherwise = histogramLine xs len ++ histogramLines xs (len - 1)
 
--- Function that returns the number of times that an element occurs in a less
+-- Function that returns the number of times that an element occurs in a list
 occurrences :: [Int] -> Int -> Int
 occurrences [] _  = 0
 occurrences (x:xs) i 
   | i == x = 1 + occurrences xs i 
   | otherwise = occurrences xs i
 
+-- Function that takes an int list and returns the number of occurences for each number in the int list
 histogramList :: [Int] -> [Int]
 histogramList [] = []
 histogramList xs = map (occurrences xs) [0..9]
