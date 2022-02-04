@@ -1,8 +1,10 @@
+--- Histogram display functions ---
+--- Draw a dot at the proper height if the number has occurred at least {height} times
 histogramLine :: [Int] -> Int -> String
 histogramLine [] _ = "\n"
-histogramLine  (x:xs) len
-  | x <= len = ' ' : histogramLine xs len
-  | otherwise = '*' : histogramLine xs len
+histogramLine  (x:xs) height
+  | x <= height = ' ' : histogramLine xs height
+  | otherwise = '*' : histogramLine xs height
 
 histogramDivider :: [Int] -> String
 histogramDivider [] = "\n"
@@ -12,13 +14,17 @@ histogramLegend :: [Int] -> String
 histogramLegend [] = "\n"
 histogramLegend (x:xs) = show x ++ histogramLegend xs
 
+--- Draw lines at each occurence height starting from the most frequent
+--- Draw the divider and the digit legend at the end
 histogramLines :: [Int] -> Int -> String
 histogramLines [] _ = ""
-histogramLines xs len 
-  | len == -2 = histogramLegend [0..9]
-  | len == -1 = histogramDivider xs ++ histogramLines xs (len - 1)
-  | otherwise = histogramLine xs len ++ histogramLines xs (len - 1)
+histogramLines xs height 
+  | height == -2 = histogramLegend [0..9]
+  | height == -1 = histogramDivider xs ++ histogramLines xs (height - 1)
+  | otherwise = histogramLine xs height ++ histogramLines xs (height - 1)
+--- End display functions ---
 
+---- Functions that build up the histogram list ----
 -- Function that returns the number of times that an element occurs in a list
 occurrences :: [Int] -> Int -> Int
 occurrences [] _  = 0
@@ -30,6 +36,7 @@ occurrences (x:xs) i
 histogramList :: [Int] -> [Int]
 histogramList [] = []
 histogramList xs = map (occurrences xs) [0..9]
+---- End histogram list functions ----
 
 -- histogram [1,4,5,4,6,6,3,4,2,4,9]
 histogram :: [Int] -> String
