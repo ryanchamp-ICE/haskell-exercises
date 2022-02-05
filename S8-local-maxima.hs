@@ -9,6 +9,6 @@ localMaxima :: [Int] -> [Int]
 localMaxima [] = []
 localMaxima [x] = []
 localMaxima [x,y] = []
-localMaxima (x:y:zs)
-  | y > x && y > head zs = y : localMaxima (y:zs)
-  | otherwise = localMaxima (y:zs)
+localMaxima (x:y:z:zs)
+  | y > x && y > z = y : localMaxima (y:z:zs)
+  | otherwise = localMaxima (y:z:zs)
