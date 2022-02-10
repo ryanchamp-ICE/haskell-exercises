@@ -1,0 +1,31 @@
+-- Implement foldl
+foldl' :: (b -> a -> b) -> b -> [a] -> b
+foldl' f z [] = z
+foldl' f z (x:xs) = f (foldl' f z xs) x
+
+foldr' :: (a -> b -> b) -> b -> [a] -> b
+foldr' f z [] = z
+foldr' f z (x:xs) = f x (foldr' f z xs)
+
+-- foldr' (-) 0 [1,2,3,4,5]
+-- (-) 1 (foldr' (-) 0 [2,3,4,5])
+-- (-) 2 ((-) 1 (foldr' (-) 0 [3,4,5]))
+-- (-) 3 ((-) 2 ((-) 1 (foldr' (-) 0 [4,5])))
+-- (((1-(2-(3-(4-(5 - 0))))
+
+-- foldl' (-) 0 [1,2,3,4,5]
+-- (-) (foldl' (-) 0 [2,3,4,5]) 1
+-- (-) (((-) foldl' (-) 0 [3,4,5]) 2) 1
+-- (((((0-5)-4)-3)-2)-1)
+-- -- (((1-(2-(3-(4-(5))))
+-- -- (((1-(2-(3-(-1))))
+-- -- (((1-(2-(4))))
+-- -- (((1-(-2))))
+-- -- (((3)))
+
+-- z :: b
+-- f :: (b -> a -> b)
+
+-- Implement foldl in terms of foldr
+foldl'' :: (b -> a -> b) -> b -> [a] -> b
+foldl'' f z xs = foldr' (\a b -> f b a) z xs
