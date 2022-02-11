@@ -7,18 +7,20 @@ histogramLine  (x:xs) height
   | otherwise = '*' : histogramLine xs height
 
 histogramDivider :: [Int] -> String
-histogramDivider [] = "\n"
-histogramDivider (x:xs) = '=' : histogramDivider xs
+-- histogramDivider [] = "\n"
+-- histogramDivider (x:xs) = '=' : histogramDivider xs
+histogramDivider xs = foldr (\_ -> (:) '=') "\n" xs
 
 histogramLegend :: [Int] -> String
-histogramLegend [] = "\n"
-histogramLegend (x:xs) = show x ++ histogramLegend xs
+-- histogramLegend [] = "\n"
+-- histogramLegend (x:xs) = show x ++ histogramLegend xs
+histogramLegend xs = foldr ((++) . show) "\n" xs
 
 --- Draw lines at each occurence height starting from the most frequent
 --- Draw the divider and the digit legend at the end
 histogramLines :: [Int] -> Int -> String
 histogramLines [] _ = ""
-histogramLines xs height 
+histogramLines xs height
   | height == -2 = histogramLegend [0..9]
   | height == -1 = histogramDivider xs ++ histogramLines xs (height - 1)
   | otherwise = histogramLine xs height ++ histogramLines xs (height - 1)
@@ -28,8 +30,8 @@ histogramLines xs height
 -- Function that returns the number of times that an element occurs in a list
 occurrences :: [Int] -> Int -> Int
 occurrences [] _  = 0
-occurrences (x:xs) i 
-  | i == x = 1 + occurrences xs i 
+occurrences (x:xs) i
+  | i == x = 1 + occurrences xs i
   | otherwise = occurrences xs i
 
 -- Function that takes an int list and returns the number of occurences for each number in the int list
