@@ -1,3 +1,7 @@
+-- Trick for folds w/ multiple elements
+-- Start with map and a lambda
+-- map (...) xs
+
 
 foobar :: [Integer] -> Integer
 foobar []     = 0

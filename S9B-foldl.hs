@@ -1,7 +1,17 @@
 -- Implement foldl
+-- This turned out to be wrong... This is essentially foldr :(
+-- ryanFoldl' :: (b -> a -> b) -> b -> [a] -> b
+-- ryanFoldl' f z [] = z
+-- ryanFoldl' f z (x:xs) = ryanFoldl' f (f z x) xs
 foldl' :: (b -> a -> b) -> b -> [a] -> b
 foldl' f z [] = z
-foldl' f z (x:xs) = f (foldl' f z xs) x
+foldl' f z (x:xs) = foldl' f (f z x) xs
+
+-- Aras/Iker's solution
+-- foldl: (b + x) + xs
+arasFoldl :: (b -> a -> b) -> b -> [a] -> b
+arasFoldl f z []     = z
+arasFoldl f z (x:xs) = arasFoldl f (f z x) xs
 
 foldr' :: (a -> b -> b) -> b -> [a] -> b
 foldr' f z [] = z
@@ -27,5 +37,6 @@ foldr' f z (x:xs) = f x (foldr' f z xs)
 -- f :: (b -> a -> b)
 
 -- Implement foldl in terms of foldr
-foldl'' :: (b -> a -> b) -> b -> [a] -> b
-foldl'' f z xs = foldr' (\a b -> f b a) z xs
+-- This is also incorrect
+-- foldl'' :: (b -> a -> b) -> b -> [a] -> b
+-- foldl'' f z xs = foldr' (\a b -> f b a) z xs
