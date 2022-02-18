@@ -100,7 +100,6 @@ insert input curNode@(Node left nodeMsgType right)
 
 insertListIntoTree :: [MessageType] -> MessageTree
 insertListIntoTree [] = Leaf
-insertListIntoTree [x] = insert x Leaf
 insertListIntoTree (x:xs) = insert x (insertListIntoTree xs)
 
 inOrder :: MessageTree -> [MessageType]
