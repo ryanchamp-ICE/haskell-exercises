@@ -1,8 +1,8 @@
 -- Implement foldl
 -- This turned out to be wrong... This is essentially foldr :(
--- ryanFoldl' :: (b -> a -> b) -> b -> [a] -> b
--- ryanFoldl' f z [] = z
--- ryanFoldl' f z (x:xs) = ryanFoldl' f (f z x) xs
+-- foldl' :: (b -> a -> b) -> b -> [a] -> b
+-- foldl' f z [] = z
+-- foldl' f z (x:xs) = f (foldl' f z xs) x    
 foldl' :: (b -> a -> b) -> b -> [a] -> b
 foldl' f z [] = z
 foldl' f z (x:xs) = foldl' f (f z x) xs

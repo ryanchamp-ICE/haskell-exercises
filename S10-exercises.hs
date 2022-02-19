@@ -42,6 +42,10 @@ isBalanced :: Tree a -> Bool
 isBalanced Leaf = True
 isBalanced (Node h left _ right) = height left == height right && isBalanced left && isBalanced right
 
+leftLean :: Tree a -> Bool 
+leftLean Leaf = False 
+leftLean (Node h left _ right) = height left > height right || leftLean left || leftLean right
+
 -- tilt :: Tree a -> Int
 -- tilt Leaf = 0
 -- tilt (Node h left _ right) = 
@@ -51,11 +55,40 @@ insertIntoTree :: a -> Tree a -> Tree a
 insertIntoTree input Leaf = Node 1 Leaf input Leaf
 insertIntoTree input curNode@(Node h left value right)
   | isBalanced curNode = Node (h + 1) (insertIntoTree input left) value right
-  | height left > height right = Node h left value (insertIntoTree input right)
+  | leftLean curNode = Node h left value (insertIntoTree input right)
   | otherwise = Node h (insertIntoTree input left) value right
 
 foldTree :: [a] -> Tree a
 foldTree xs = foldr insertIntoTree Leaf xs
+
+-- foldl insert Leaf [1,2,3,4]
+-- foldl insert (insert 1 Leaf) [2,3,4]
+-- foldl insert (Node 1 Leaf 1 Leaf) [2,3,4]
+-- foldl insert (insert 2 (Node 1 Leaf 1 Leaf)) [3,4]
+-- foldl insert (Node 2 (insert 2 Leaf) 1 Leaf) [3,4]
+-- foldl insert (Node 2 (Node 1 Leaf 2 Leaf) 1 Leaf) [3,4]
+-- foldl insert (insert 3 (Node 2 (Node 1 Leaf 2 Leaf) 1 Leaf)) [4]
+-- foldl insert (Node 2 (Node 1 Leaf 2 Leaf) 1 (insert 3 Leaf)) [4]
+-- foldl insert (Node 2 (Node 1 Leaf 2 Leaf) 1 (Node Leaf 3 Leaf)) [4]
+-- foldl insert (Node 3 (insert 4 (Node 1 Leaf 2 Leaf) 1 (Node Leaf 3 Leaf))) []
+-- foldl insert (Node 3 (Node 2 ((insert 4 Leaf) 2 Leaf)) 1 (Node Leaf 3 Leaf)) []
+-- foldl insert (Node 3 (Node 2 ((Node 1 Leaf 4 Leaf) 2 Leaf)) 1 (Node Leaf 3 Leaf)) []
+-- Node 3 (Node 2 ((Node 1 Leaf 4 Leaf) 2 Leaf)) 1 (Node Leaf 3 Leaf)
+
+-- foldr insert Leaf [1,2,3,4]
+-- insert 1 (foldr insert Leaf [2,3,4])
+-- insert 1 (insert 2 (foldr insert Leaf [3,4]))
+-- insert 1 (insert 2 (insert 3 (foldr insert Leaf [4])))
+-- insert 1 (insert 2 (insert 3 (insert 4 (foldr insert Leaf []))))  
+-- insert 1 (insert 2 (insert 3 (insert 4 [])))
+-- insert 1 (insert 2 (insert 3 (Node 1 Leaf 4 Leaf)))
+-- insert 1 (insert 2 (Node (1+1) (insert 3 Leaf) 4 Leaf))
+-- insert 1 (insert 2 (Node 2 (Node 1 Leaf 3 Leaf) 4 Leaf))
+-- insert 1 (Node 2 (Node 1 Leaf 3 Leaf) 4 (insert 2 Leaf))
+-- insert 1 (Node 2 (Node 1 Leaf 3 Leaf) 4 (Node 1 Leaf 2 Leaf))
+-- Node (2+1) (insert 1 (Node 1 Leaf 3 Leaf) 4 (Node 1 Leaf 2 Leaf))
+-- Node 3 (Node (1+1) (insert 1 Leaf) 3 Leaf) 4 (Node 1 Leaf 2 Leaf)
+-- Node 3 (Node 2 (Node 1 Leaf 1 Leaf) 3 Leaf) 4 (Node 1 Leaf 2 Leaf)
 
 -- foldr insert Leaf [1,2,3,4,5,6,7]
 -- insert 1 (insert 2 (insert 3 (insert 4 (insert 5 (insert 6 (insert 7 (foldr insert Leaf [])))))))
@@ -73,31 +106,40 @@ foldTree xs = foldr insertIntoTree Leaf xs
 -- insert 1 (insert 2 (Node 3 (Node 2 (Node 1 Leaf 4 Leaf) 6 Leaf) 7 (Node 2 (Node 1 Leaf 3 Leaf) 5 Leaf))
 -- insert 1 (insert 2 (Node 3 (Node 2 (Node 1 Leaf 4 Leaf) 6 Leaf) 7 (Node 2 (Node 1 Leaf 3 Leaf) 5 Leaf))
 
--- foldr insert Leaf [1,2,3,4]
--- insert 1 (foldr insert Leaf [2,3,4])
--- insert 1 (insert 2 (foldr insert Leaf [3,4]))
--- insert 1 (insert 2 (insert 3 (foldr insert Leaf [4])))
--- insert 1 (insert 2 (insert 3 (insert 4 (foldr insert Leaf []))))  
--- insert 1 (insert 2 (insert 3 (insert 4 [])))
--- insert 1 (insert 2 (insert 3 (Node 1 Leaf 4 Leaf)))
--- insert 1 (insert 2 (Node (1+1) (insert 3 Leaf) 4 Leaf))
--- insert 1 (insert 2 (Node 2 (Node 1 Leaf 3 Leaf) 4 Leaf))
--- insert 1 (Node 2 (Node 1 Leaf 3 Leaf) 4 (insert 2 Leaf))
--- insert 1 (Node 2 (Node 1 Leaf 3 Leaf) 4 (Node 1 Leaf 2 Leaf))
--- Node (2+1) (insert 1 (Node 1 Leaf 3 Leaf) 4 (Node 1 Leaf 2 Leaf))
--- Node 3 (Node (1+1) (insert 1 Leaf) 3 Leaf) 4 (Node 1 Leaf 2 Leaf)
--- Node 3 (Node 2 (Node 1 Leaf 1 Leaf) 3 Leaf) 4 (Node 1 Leaf 2 Leaf)
+
 
 
 -- Implement xor using fold
--- xor :: [Bool] -> Bool
+xor :: [Bool] -> Bool
+xor xs = odd $ foldr (\_ i -> i + 1) 0 (filter (== True) xs)
 
 -- Implement map as a fold
--- map' :: (a -> b) -> [a] -> [b]
+map' :: (a -> b) -> [a] -> [b]
+map' f xs = foldr (\x ys -> f x : ys) [] xs
 
--- Implement foldl using foldr
+-- Implement foldl using foldr (attempt 2)
+-- From wikipedia: 
+-- For every function defined as
+--  g [] = v
+--  g (x:xs) = f x (g xs)
+--  g can be defined as:
+--  g = foldr f v
+-- foldl' f z [] = z
+-- foldl' f z (x:xs) = foldl' f (f z x) xs
+-- foldl' :: (b -> a -> b) -> b -> [a] -> b
+-- foldl' f z xs = foldr (\x -> foldl' f (f z x)) z xs
+
 
 -- Implement Sieve of Sundaram
 -- sieveSundaram :: Int -> [Int]
+-- Start with a list of the integers from 1 to n.
+-- From this list, remove all numbers of the form i + j + 2ij where:
+-- 1 <= i <= j
+-- i + j + 2ij <= n
+-- The remaining numbers are doubled and incremented by one, 
+-- giving a list of the odd prime numbers (i.e., all primes except 2) below 2n + 1.
+sieveOfSundaram :: Int -> [Int]
+sieveOfSundaram n = map (\x -> (2 * x) + 1) sieveList
+  where sieveList = [i + j + (2 * i * j) | i <- [1..n], j <- [i..n], i + j + (2 * i * j) <= n]
 
 -- cartesian Product
