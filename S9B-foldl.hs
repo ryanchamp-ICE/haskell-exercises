@@ -38,5 +38,5 @@ foldr' f z (x:xs) = f x (foldr' f z xs)
 
 -- Implement foldl in terms of foldr
 -- This is also incorrect
--- foldl'' :: (b -> a -> b) -> b -> [a] -> b
--- foldl'' f z xs = foldr' (\a b -> f b a) z xs
+foldl'' :: (b -> a -> b) -> b -> [a] -> b
+foldl'' f z xs = foldr (flip f) z (reverse xs)

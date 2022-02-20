@@ -10,5 +10,5 @@ localMaxima [] = []
 localMaxima [x] = []
 localMaxima [x,y] = []
 localMaxima (x:y:z:zs)
-  | y > x && y > z = y : localMaxima (y:z:zs)
+  | y > x && y > z = y : localMaxima (z:zs)
   | otherwise = localMaxima (y:z:zs)

@@ -7,12 +7,13 @@ fun1 (x : xs)
 
 fun1' :: [Int] -> Int
 fun1' xs = product $ map (\x -> x - 2) $ filter even xs
+-- fun1' = product . map (-2) . filter even
 
 fun2 :: Int -> Int
 fun2 1 = 0
 fun2 n
   | even n = n + fun2 (n `div` 2)
-  | otherwise = fun2 (3 * n + 1)
+  | otherwise = fun2 (3 * n + 1)  
 
 -- fun2 3
 -- fun2 (3 * 3 + 1) => fun 10
@@ -24,8 +25,23 @@ fun2 n
 -- 10 + 16 + 8 + 4 + 2 + fun2 1
 -- 10 + 16 + 8 + 4 + 2 + 0 => 40
 
+-- Did not implement
 -- fun2' :: Int -> Int
 -- fun2' x =
+
+-- Arthur's Solution
+func2 :: Int -> Int
+func2 1 = 0
+func2 n | even n    = n + func2 (n `div` 2)
+        | otherwise = func2 (3 * n + 1)
+
+
+func2' :: Int -> Int
+func2' = sum . filter even . takeWhile (> 1) . iterate
+    (\x -> case () of
+        _ | even x -> x `div` 2
+          | odd x  -> 3 * x + 1
+    )
 
 -- Folding with trees
 -- Folding a list of elements to build a balanced binary tree
@@ -40,7 +56,7 @@ height (Node h _ _ _) = h
 
 isBalanced :: Tree a -> Bool
 isBalanced Leaf = True
-isBalanced (Node h left _ right) = height left == height right && isBalanced left && isBalanced right
+isBalanced (Node h left _ right) = abs (height left - height right) <= 1 && isBalanced left && isBalanced right
 
 leftLean :: Tree a -> Bool 
 leftLean Leaf = False 
@@ -58,8 +74,29 @@ insertIntoTree input curNode@(Node h left value right)
   | leftLean curNode = Node h left value (insertIntoTree input right)
   | otherwise = Node h (insertIntoTree input left) value right
 
+insertIntoTree' :: a -> Tree a -> Tree a
+insertIntoTree' input Leaf =
+    let left = Leaf
+        right = Leaf
+        h1 = max (height left) (height right) + 1
+     in Node h1 left input right
+insertIntoTree' input curNode@(Node h left value right)
+    | height left > height right =
+        let left1 = left
+            right1 = insertIntoTree' input right
+            h1 = max (height left1) (height right1) + 1
+        in Node h1 left1 value right1
+    | otherwise =
+        let left1 = insertIntoTree' input left
+            right1 = right
+            h1 = max (height left1) (height right1) + 1
+        in Node h1 left1 value right1
+
+
 foldTree :: [a] -> Tree a
-foldTree xs = foldr insertIntoTree Leaf xs
+foldTree xs = foldr insertIntoTree' Leaf xs
+
+result = isBalanced (foldTree [1, 2, 3,4 ,5, 6,7, 8, 9])
 
 -- foldl insert Leaf [1,2,3,4]
 -- foldl insert (insert 1 Leaf) [2,3,4]
@@ -113,6 +150,12 @@ foldTree xs = foldr insertIntoTree Leaf xs
 xor :: [Bool] -> Bool
 xor xs = odd $ foldr (\_ i -> i + 1) 0 (filter (== True) xs)
 
+-- xor :: [Bool] -> Bool
+-- xor = odd . length . filter (==True)
+
+xor' :: [Bool] -> Bool
+xor' = foldr (/=) False 
+
 -- Implement map as a fold
 map' :: (a -> b) -> [a] -> [b]
 map' f xs = foldr (\x ys -> f x : ys) [] xs
@@ -125,9 +168,14 @@ map' f xs = foldr (\x ys -> f x : ys) [] xs
 --  g can be defined as:
 --  g = foldr f v
 -- foldl' f z [] = z
--- foldl' f z (x:xs) = foldl' f (f z x) xs
+-- foldl' f z (x:xs) = foldl' f (f z x) xs => g (f z x)
+-- Hint: think of composition of functions (.)
+-- g == foldl' f z
+-- v = z
+-- f x = (f z x)
+-- foldr :: (a -> b -> b)
 -- foldl' :: (b -> a -> b) -> b -> [a] -> b
--- foldl' f z xs = foldr (\x -> foldl' f (f z x)) z xs
+-- foldl' f z xs = foldr (\x -> ) z xs
 
 
 -- Implement Sieve of Sundaram
@@ -139,7 +187,7 @@ map' f xs = foldr (\x ys -> f x : ys) [] xs
 -- The remaining numbers are doubled and incremented by one, 
 -- giving a list of the odd prime numbers (i.e., all primes except 2) below 2n + 1.
 sieveOfSundaram :: Int -> [Int]
-sieveOfSundaram n = map (\x -> (2 * x) + 1) sieveList
+sieveOfSundaram n = map (\x -> (2 * x) + 1) $ filter (`notElem` sieveList) [1..n]
   where sieveList = [i + j + (2 * i * j) | i <- [1..n], j <- [i..n], i + j + (2 * i * j) <= n]
 
 -- cartesian Product
